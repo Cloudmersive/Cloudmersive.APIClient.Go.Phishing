@@ -1,0 +1,264 @@
+---
+swagger: "2.0"
+info:
+  description: "Easily and directly scan and block phishing security threats in input."
+  version: "v1"
+  title: "phishingapi"
+security:
+- Apikey: []
+paths:
+  /phishing/detect/file:
+    post:
+      tags:
+      - "PhishingDetection"
+      summary: "Perform AI phishing detection and classification on an input image\
+        \ or document (PDF or DOCX).  Analyzes input content as well as embedded URLs\
+        \ with AI deep learnign to detect phishing and other unsafe content.  Uses\
+        \ 100-125 API calls depending on model selected."
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "text/plain"
+      - "application/json"
+      - "text/json"
+      parameters:
+      - name: "model"
+        in: "header"
+        description: "Model to use; default setting is Advanced"
+        required: false
+        type: "string"
+        default: "Advanced"
+        x-exportParamName: "Model"
+        x-optionalDataType: "String"
+      - name: "inputFile"
+        in: "formData"
+        required: false
+        type: "file"
+        x-exportParamName: "InputFile"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/PhishingDetectionResponse"
+  /phishing/detect/text-string/advanced:
+    post:
+      tags:
+      - "PhishingDetection"
+      summary: "Perform advanced AI phishing detection and classification against\
+        \ input text string.  Analyzes input content as well as embedded URLs with\
+        \ AI deep learnign to detect spam, phishing and other unsafe content.  Uses\
+        \ 25-100 API calls depending on model selected."
+      consumes:
+      - "application/json"
+      - "text/json"
+      - "application/*+json"
+      produces:
+      - "text/plain"
+      - "application/json"
+      - "text/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Phishing detection request"
+        required: false
+        schema:
+          $ref: "#/definitions/PhishingDetectionAdvancedRequest"
+        x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/PhishingDetectionAdvancedResponse"
+  /phishing/detect/file/advanced:
+    post:
+      tags:
+      - "PhishingDetection"
+      summary: "Perform advanced AI phishing detection and classification against\
+        \ input text string.  Analyzes input content as well as embedded URLs with\
+        \ AI deep learning to detect phishing, phishing and other unsafe content.\
+        \  Uses 25-100 API calls depending on model selected."
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "text/plain"
+      - "application/json"
+      - "text/json"
+      parameters:
+      - name: "model"
+        in: "header"
+        required: false
+        type: "string"
+        default: "Advanced"
+        x-exportParamName: "Model"
+        x-optionalDataType: "String"
+      - name: "inputFile"
+        in: "formData"
+        required: false
+        type: "file"
+        x-exportParamName: "InputFile"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/PhishingDetectionAdvancedResponse"
+  /phishing/detect/email/advanced:
+    post:
+      tags:
+      - "PhishingDetection"
+      summary: "Perform advanced AI phishing detection and classification against\
+        \ input email.  Analyzes input email as well as embedded URLs with AI deep\
+        \ learning to detect phishing, phishing and other unsafe content.  Uses 25-100\
+        \ API calls depending on model selected."
+      consumes:
+      - "application/json"
+      - "text/json"
+      - "application/*+json"
+      produces:
+      - "text/plain"
+      - "application/json"
+      - "text/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Phishing detection request"
+        required: false
+        schema:
+          $ref: "#/definitions/AdvancedEmailDetectionRequest"
+        x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/PhishingDetectionEmailAdvancedResponse"
+securityDefinitions:
+  Apikey:
+    description: "Apikey"
+    type: "apiKey"
+    name: "Apikey"
+    in: "header"
+definitions:
+  AdvancedEmailDetectionRequest:
+    type: "object"
+    properties:
+      FromEmailAddress:
+        type: "string"
+        description: "Email address of the sender"
+      ToEmailAddress:
+        type: "string"
+        description: "Email address of the recipient"
+      Subject:
+        type: "string"
+        description: "Subject of the email"
+      HtmlBody:
+        type: "string"
+        description: "Body of the email in HTML, or text"
+      AllowLowReputationSenders:
+        type: "boolean"
+        description: "Allow email from low reputation senders and domains"
+      AllowSanctioned:
+        type: "boolean"
+        description: "True to allow sanctioned countries and certain known sanctioned\
+          \ entities, false otherwise (default)"
+      InputEmailFile:
+        type: "string"
+        format: "byte"
+        pattern: "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"
+    description: "Request to detect phishing from an email"
+    example:
+      FromEmailAddress: "FromEmailAddress"
+      InputEmailFile: "InputEmailFile"
+      HtmlBody: "HtmlBody"
+      AllowSanctioned: true
+      Subject: "Subject"
+      AllowLowReputationSenders: true
+      ToEmailAddress: "ToEmailAddress"
+  PhishingDetectionAdvancedRequest:
+    type: "object"
+    properties:
+      InputString:
+        type: "string"
+        description: "Input text string to detect phishing against"
+      Model:
+        type: "string"
+        description: "Optional: Specify which AI model to use.  Possible choices are\
+          \ Normal and Advanced.  Default is Advanced."
+    description: "AI advanced phishing detection request"
+    example:
+      InputString: "InputString"
+      Model: "Model"
+  PhishingDetectionAdvancedResponse:
+    type: "object"
+    properties:
+      CleanResult:
+        type: "boolean"
+        description: "True if the result is not phishing (clean), and false otherwise"
+      PhishingRiskLevel:
+        type: "number"
+        format: "double"
+        description: "Overall phishing risk level between 0.0 and 1.0"
+      AnalysisRationale:
+        type: "string"
+        description: "Rationale for why the conclusion was formed"
+    description: "Result of detecting phishing using AI"
+    example:
+      PhishingRiskLevel: 0.8008281904610115
+      AnalysisRationale: "AnalysisRationale"
+      CleanResult: true
+  PhishingDetectionEmailAdvancedResponse:
+    type: "object"
+    properties:
+      CleanResult:
+        type: "boolean"
+        description: "True if the result is not phishing (clean), and false otherwise"
+      PhishingRiskLevel:
+        type: "number"
+        format: "double"
+        description: "Overall phishing risk level between 0.0 and 1.0"
+      SpamRiskLevel:
+        type: "number"
+        format: "double"
+        description: "Overall phishing spam level between 0.0 and 1.0"
+      ContainsLowReputationSender:
+        type: "boolean"
+        description: "True if the input email is from a low reputation sender"
+      ContainsPhishing:
+        type: "boolean"
+        description: "True if the input email contains phishing threat risks, false\
+          \ otherwise"
+      ContainsSpam:
+        type: "boolean"
+        description: "True if the email contains phishing threat risks, false otherwise"
+      ContainsUnsolicitedSales:
+        type: "boolean"
+        description: "True if the input email contains unsolicited sales, false otherwise"
+      ContainsPromotionalContent:
+        type: "boolean"
+        description: "True if the input email contains promotional content, false\
+          \ otherwise"
+      ContainsPhishingAttempt:
+        type: "boolean"
+        description: "True if the input email contains a phishing attempt, false otherwise"
+      AnalysisRationale:
+        type: "string"
+        description: "Rationale for why the conclusion was formed"
+    description: "Result of detecting phishing using AI"
+    example:
+      PhishingRiskLevel: 0.8008281904610115
+      ContainsSpam: true
+      ContainsUnsolicitedSales: true
+      ContainsPhishingAttempt: true
+      SpamRiskLevel: 6.027456183070403
+      ContainsPhishing: true
+      ContainsLowReputationSender: true
+      AnalysisRationale: "AnalysisRationale"
+      CleanResult: true
+      ContainsPromotionalContent: true
+  PhishingDetectionResponse:
+    type: "object"
+    properties:
+      CleanResult:
+        type: "boolean"
+        description: "True if the result is not phishing (clean), and false otherwise"
+    description: "Result of detecting phishing using AI"
+    example:
+      CleanResult: true
