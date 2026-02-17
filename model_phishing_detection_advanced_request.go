@@ -15,4 +15,22 @@ type PhishingDetectionAdvancedRequest struct {
 	InputString string `json:"InputString,omitempty"`
 	// Optional: Specify which AI model to use.  Possible choices are Normal and Advanced.  Default is Advanced.
 	Model string `json:"Model,omitempty"`
+	// Apply a Custom Policy for Phishing Enforcement by providing the ID; to create a Custom Policy,  navigate to the Cloudmersive Management Portal and select Custom Policies.  Requires Managed Instance or Private Cloud
+	CustomPolicyID string `json:"CustomPolicyID,omitempty"`
+	// Optional: Set to true to include an analysis rationale in the response explaining why the content was or was not flagged.  Default is true.
+	ProvideAnalysisRationale bool `json:"ProvideAnalysisRationale,omitempty"`
+	// Optional: Type of text being analyzed. Must be one of: \"Text Message\", \"User Message\", \"Sales Lead\", \"Email Message\", \"Support Case\", \"Other\".
+	TextType string `json:"TextType,omitempty"`
+	// Optional: Name of the sender
+	FromName string `json:"FromName,omitempty"`
+	// Optional: Name of the recipient
+	ToName string `json:"ToName,omitempty"`
+	// Optional: Phone number of the sender
+	FromPhoneNumber string `json:"FromPhoneNumber,omitempty"`
+	// Optional: Phone number of the recipient
+	ToPhoneNumber string `json:"ToPhoneNumber,omitempty"`
+	// Optional: Email address of the sender
+	FromEmailAddress string `json:"FromEmailAddress,omitempty"`
+	// Optional: Email address of the recipient
+	ToEmailAddress string `json:"ToEmailAddress,omitempty"`
 }

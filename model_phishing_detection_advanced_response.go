@@ -15,6 +15,8 @@ type PhishingDetectionAdvancedResponse struct {
 	CleanResult bool `json:"CleanResult,omitempty"`
 	// Overall phishing risk level between 0.0 and 1.0
 	PhishingRiskLevel float64 `json:"PhishingRiskLevel,omitempty"`
+	// Confidence level between 0.0 and 1.0 where values over 0.9 indicate high confidence
+	ConfidenceLevel float64 `json:"ConfidenceLevel,omitempty"`
 	// Rationale for why the conclusion was formed
 	AnalysisRationale string `json:"AnalysisRationale,omitempty"`
 }
