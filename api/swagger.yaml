@@ -40,6 +40,33 @@ paths:
           description: "OK"
           schema:
             $ref: "#/definitions/PhishingDetectionResponse"
+  /phishing/detect/text-string:
+    post:
+      tags:
+      - "PhishingDetection"
+      summary: "Perform AI phishing detection against input text string.  Returns\
+        \ a clean/not-clean result with confidence level and optional rationale."
+      consumes:
+      - "application/json"
+      - "text/json"
+      - "application/*+json"
+      produces:
+      - "text/plain"
+      - "application/json"
+      - "text/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Phishing detection request"
+        required: false
+        schema:
+          $ref: "#/definitions/PhishingDetectionTextStringRequest"
+        x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/PhishingDetectionTextStringResponse"
   /phishing/detect/text-string/advanced:
     post:
       tags:
@@ -237,68 +264,139 @@ definitions:
     properties:
       InputString:
         type: "string"
+        example: "Hello, world!"
         description: "Input text string to detect phishing against"
+      TextType:
+        type: "string"
+        example: "TextMessage"
+        description: "Optional: Type of text being analyzed. Must be one of: \"TextMessage\"\
+          , \"UserMessage\", \"SalesLead\", \"EmailMessage\", \"SupportCase\", \"\
+          AppMessage\", \"Other\"."
       Model:
         type: "string"
+        example: "Advanced"
         description: "Optional: Specify which AI model to use.  Possible choices are\
           \ Normal and Advanced.  Default is Advanced."
+      AllowUnsolicitedSales:
+        type: "boolean"
+        example: true
+        description: "Optional: True if unsolicited sales should be allowed, false\
+          \ otherwise. Defaults to true."
+      AllowPromotionalContent:
+        type: "boolean"
+        example: true
+        description: "Optional: True if promotional content should be allowed, false\
+          \ otherwise. Defaults to true."
+      AllowWebUrls:
+        type: "boolean"
+        example: true
+        description: "Optional: True if web URLs should be allowed in the input text,\
+          \ false otherwise. Defaults to true. When false, input containing URLs (including\
+          \ homoglyph URLs and spaced-out URLs) will be flagged as not clean."
+      AllowPhoneNumbers:
+        type: "boolean"
+        example: true
+        description: "Optional: True if phone numbers should be allowed in the input\
+          \ text, false otherwise. Defaults to true. When false, input containing\
+          \ phone numbers (including homoglyph digits and spaced-out or spelled-out\
+          \ workarounds) will be flagged as not clean."
+      AllowEmailAddresses:
+        type: "boolean"
+        example: true
+        description: "Optional: True if email addresses should be allowed in the input\
+          \ text, false otherwise. Defaults to true. When false, input containing\
+          \ email addresses (including homoglyph characters and obfuscated workarounds\
+          \ like \"danny at somedomaine [DOT] com\") will be flagged as not clean."
+      ProvideUrlAnalysis:
+        type: "boolean"
+        example: true
+        description: "Optional: True to perform deep URL analysis on any URLs detected\
+          \ in the text. When enabled, if the initial AI scan detects URLs, a second\
+          \ AI call enumerates them and each URL is individually analyzed for phishing.\
+          \ Defaults to true."
       CustomPolicyID:
         type: "string"
+        example: ""
         description: "Apply a Custom Policy for Phishing Enforcement by providing\
           \ the ID; to create a Custom Policy,\r\nnavigate to the Cloudmersive Management\
           \ Portal and select Custom Policies.\r\nRequires Managed Instance or Private\
           \ Cloud"
       ProvideAnalysisRationale:
         type: "boolean"
+        example: true
         description: "Optional: Set to true to include an analysis rationale in the\
           \ response explaining why the content was or was not flagged.  Default is\
           \ true."
-      TextType:
-        type: "string"
-        description: "Optional: Type of text being analyzed. Must be one of: \"Text\
-          \ Message\", \"User Message\", \"Sales Lead\", \"Email Message\", \"Support\
-          \ Case\", \"Other\"."
       FromName:
         type: "string"
+        example: "John Smith"
         description: "Optional: Name of the sender"
       ToName:
         type: "string"
+        example: "Jane Doe"
         description: "Optional: Name of the recipient"
       FromPhoneNumber:
         type: "string"
+        example: "+1-555-123-4567"
         description: "Optional: Phone number of the sender"
       ToPhoneNumber:
         type: "string"
+        example: "+1-555-987-6543"
         description: "Optional: Phone number of the recipient"
       FromEmailAddress:
         type: "string"
+        example: "john.smith@cloudmersive.com"
         description: "Optional: Email address of the sender"
       ToEmailAddress:
         type: "string"
+        example: "jane.doe@cloudmersive.com"
         description: "Optional: Email address of the recipient"
     description: "AI advanced phishing detection request"
     example:
-      FromEmailAddress: "FromEmailAddress"
-      FromName: "FromName"
-      CustomPolicyID: "CustomPolicyID"
-      InputString: "InputString"
-      Model: "Model"
+      AllowWebUrls: true
+      FromEmailAddress: "john.smith@cloudmersive.com"
+      AllowPhoneNumbers: true
+      FromPhoneNumber: "+1-555-123-4567"
+      AllowUnsolicitedSales: true
+      ProvideUrlAnalysis: true
+      TextType: "TextMessage"
+      ToPhoneNumber: "+1-555-987-6543"
+      FromName: "John Smith"
+      CustomPolicyID: ""
+      InputString: "Hello, world!"
+      Model: "Advanced"
       ProvideAnalysisRationale: true
-      FromPhoneNumber: "FromPhoneNumber"
-      ToName: "ToName"
-      TextType: "TextType"
-      ToPhoneNumber: "ToPhoneNumber"
-      ToEmailAddress: "ToEmailAddress"
+      AllowEmailAddresses: true
+      ToName: "Jane Doe"
+      AllowPromotionalContent: true
+      ToEmailAddress: "jane.doe@cloudmersive.com"
   PhishingDetectionAdvancedResponse:
     type: "object"
     properties:
       CleanResult:
         type: "boolean"
         description: "True if the result is not phishing (clean), and false otherwise"
-      PhishingRiskLevel:
-        type: "number"
-        format: "double"
-        description: "Overall phishing risk level between 0.0 and 1.0"
+      ContainsPhishing:
+        type: "boolean"
+        description: "True if the input text contains a phishing attempt, false otherwise"
+      ContainsUnsolicitedSales:
+        type: "boolean"
+        description: "True if the input text contains unsolicited sales, false otherwise"
+      ContainsPromotionalContent:
+        type: "boolean"
+        description: "True if the input text contains promotional content, false otherwise"
+      ContainsWebUrls:
+        type: "boolean"
+        description: "True if the input text contains web URLs, including homoglyph\
+          \ URLs and spaced-out URL workarounds"
+      ContainsPhoneNumbers:
+        type: "boolean"
+        description: "True if the input text contains phone numbers, including homoglyph\
+          \ digits and spaced-out or spelled-out workarounds"
+      ContainsEmailAddresses:
+        type: "boolean"
+        description: "True if the input text contains email addresses, including homoglyph\
+          \ characters and obfuscated workarounds"
       ConfidenceLevel:
         type: "number"
         format: "double"
@@ -307,12 +405,35 @@ definitions:
       AnalysisRationale:
         type: "string"
         description: "Rationale for why the conclusion was formed"
+      UnsafeUrls:
+        type: "array"
+        description: "URLs detected in the input text that were analyzed and found\
+          \ to be unsafe. Only populated when ProvideUrlAnalysis is true and URLs\
+          \ are detected."
+        items:
+          $ref: "#/definitions/UnsafeUrlResult"
     description: "Result of detecting phishing using AI"
     example:
-      PhishingRiskLevel: 0.8008281904610115
-      ConfidenceLevel: 6.027456183070403
+      ConfidenceLevel: 0.8008281904610115
+      ContainsUnsolicitedSales: true
+      ContainsWebUrls: true
+      ContainsPhishing: true
+      ContainsPhoneNumbers: true
+      ContainsEmailAddresses: true
+      UnsafeUrls:
+      - IsSsrfThreat: true
+        ContainsPhishingAttempt: true
+        ContainsPhishing: true
+        Url: "Url"
+        CleanResult: true
+      - IsSsrfThreat: true
+        ContainsPhishingAttempt: true
+        ContainsPhishing: true
+        Url: "Url"
+        CleanResult: true
       AnalysisRationale: "AnalysisRationale"
       CleanResult: true
+      ContainsPromotionalContent: true
   PhishingDetectionEmailAdvancedResponse:
     type: "object"
     properties:
@@ -371,6 +492,48 @@ definitions:
     description: "Result of detecting phishing using AI"
     example:
       CleanResult: true
+  PhishingDetectionTextStringRequest:
+    type: "object"
+    properties:
+      InputString:
+        type: "string"
+        example: "Hello, world!"
+        description: "Input text string to detect phishing against"
+      Model:
+        type: "string"
+        example: "Advanced"
+        description: "Optional: Specify which AI model to use.  Possible choices are\
+          \ Normal and Advanced.  Default is Advanced."
+      ProvideAnalysisRationale:
+        type: "boolean"
+        example: true
+        description: "Optional: Set to true to include an analysis rationale in the\
+          \ response explaining why the content was or was not flagged.  Default is\
+          \ true."
+    description: "AI phishing detection request for basic text string analysis"
+    example:
+      InputString: "Hello, world!"
+      Model: "Advanced"
+      ProvideAnalysisRationale: true
+  PhishingDetectionTextStringResponse:
+    type: "object"
+    properties:
+      CleanResult:
+        type: "boolean"
+        description: "True if the result is not phishing (clean), and false otherwise"
+      ConfidenceLevel:
+        type: "number"
+        format: "double"
+        description: "Confidence level between 0.0 and 1.0 where values over 0.9 indicate\
+          \ high confidence"
+      AnalysisRationale:
+        type: "string"
+        description: "Rationale for why the conclusion was formed"
+    description: "Result of detecting phishing using AI for basic text string analysis"
+    example:
+      ConfidenceLevel: 0.8008281904610115
+      AnalysisRationale: "AnalysisRationale"
+      CleanResult: true
   PhishingDetectionUrlAdvancedResponse:
     type: "object"
     properties:
@@ -409,3 +572,28 @@ definitions:
       AnalysisRationale: "AnalysisRationale"
       CleanResult: true
       ContainsPromotionalContent: true
+  UnsafeUrlResult:
+    type: "object"
+    properties:
+      Url:
+        type: "string"
+        description: "The URL that was detected and analyzed"
+      CleanResult:
+        type: "boolean"
+        description: "True if the result is not phishing (clean), and false otherwise"
+      IsSsrfThreat:
+        type: "boolean"
+        description: "True if the URL is an SSRF threat"
+      ContainsPhishing:
+        type: "boolean"
+        description: "True if the URL contains phishing threat risks, false otherwise"
+      ContainsPhishingAttempt:
+        type: "boolean"
+        description: "True if the URL contains a phishing attempt, false otherwise"
+    description: "Result of analyzing an individual URL found in text"
+    example:
+      IsSsrfThreat: true
+      ContainsPhishingAttempt: true
+      ContainsPhishing: true
+      Url: "Url"
+      CleanResult: true

@@ -13,14 +13,26 @@ package Go-CloudmersivePhishingApiClient
 type PhishingDetectionAdvancedRequest struct {
 	// Input text string to detect phishing against
 	InputString string `json:"InputString,omitempty"`
+	// Optional: Type of text being analyzed. Must be one of: \"TextMessage\", \"UserMessage\", \"SalesLead\", \"EmailMessage\", \"SupportCase\", \"AppMessage\", \"Other\".
+	TextType string `json:"TextType,omitempty"`
 	// Optional: Specify which AI model to use.  Possible choices are Normal and Advanced.  Default is Advanced.
 	Model string `json:"Model,omitempty"`
+	// Optional: True if unsolicited sales should be allowed, false otherwise. Defaults to true.
+	AllowUnsolicitedSales bool `json:"AllowUnsolicitedSales,omitempty"`
+	// Optional: True if promotional content should be allowed, false otherwise. Defaults to true.
+	AllowPromotionalContent bool `json:"AllowPromotionalContent,omitempty"`
+	// Optional: True if web URLs should be allowed in the input text, false otherwise. Defaults to true. When false, input containing URLs (including homoglyph URLs and spaced-out URLs) will be flagged as not clean.
+	AllowWebUrls bool `json:"AllowWebUrls,omitempty"`
+	// Optional: True if phone numbers should be allowed in the input text, false otherwise. Defaults to true. When false, input containing phone numbers (including homoglyph digits and spaced-out or spelled-out workarounds) will be flagged as not clean.
+	AllowPhoneNumbers bool `json:"AllowPhoneNumbers,omitempty"`
+	// Optional: True if email addresses should be allowed in the input text, false otherwise. Defaults to true. When false, input containing email addresses (including homoglyph characters and obfuscated workarounds like \"danny at somedomaine [DOT] com\") will be flagged as not clean.
+	AllowEmailAddresses bool `json:"AllowEmailAddresses,omitempty"`
+	// Optional: True to perform deep URL analysis on any URLs detected in the text. When enabled, if the initial AI scan detects URLs, a second AI call enumerates them and each URL is individually analyzed for phishing. Defaults to true.
+	ProvideUrlAnalysis bool `json:"ProvideUrlAnalysis,omitempty"`
 	// Apply a Custom Policy for Phishing Enforcement by providing the ID; to create a Custom Policy,  navigate to the Cloudmersive Management Portal and select Custom Policies.  Requires Managed Instance or Private Cloud
 	CustomPolicyID string `json:"CustomPolicyID,omitempty"`
 	// Optional: Set to true to include an analysis rationale in the response explaining why the content was or was not flagged.  Default is true.
 	ProvideAnalysisRationale bool `json:"ProvideAnalysisRationale,omitempty"`
-	// Optional: Type of text being analyzed. Must be one of: \"Text Message\", \"User Message\", \"Sales Lead\", \"Email Message\", \"Support Case\", \"Other\".
-	TextType string `json:"TextType,omitempty"`
 	// Optional: Name of the sender
 	FromName string `json:"FromName,omitempty"`
 	// Optional: Name of the recipient

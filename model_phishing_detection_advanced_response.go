@@ -13,10 +13,22 @@ package Go-CloudmersivePhishingApiClient
 type PhishingDetectionAdvancedResponse struct {
 	// True if the result is not phishing (clean), and false otherwise
 	CleanResult bool `json:"CleanResult,omitempty"`
-	// Overall phishing risk level between 0.0 and 1.0
-	PhishingRiskLevel float64 `json:"PhishingRiskLevel,omitempty"`
+	// True if the input text contains a phishing attempt, false otherwise
+	ContainsPhishing bool `json:"ContainsPhishing,omitempty"`
+	// True if the input text contains unsolicited sales, false otherwise
+	ContainsUnsolicitedSales bool `json:"ContainsUnsolicitedSales,omitempty"`
+	// True if the input text contains promotional content, false otherwise
+	ContainsPromotionalContent bool `json:"ContainsPromotionalContent,omitempty"`
+	// True if the input text contains web URLs, including homoglyph URLs and spaced-out URL workarounds
+	ContainsWebUrls bool `json:"ContainsWebUrls,omitempty"`
+	// True if the input text contains phone numbers, including homoglyph digits and spaced-out or spelled-out workarounds
+	ContainsPhoneNumbers bool `json:"ContainsPhoneNumbers,omitempty"`
+	// True if the input text contains email addresses, including homoglyph characters and obfuscated workarounds
+	ContainsEmailAddresses bool `json:"ContainsEmailAddresses,omitempty"`
 	// Confidence level between 0.0 and 1.0 where values over 0.9 indicate high confidence
 	ConfidenceLevel float64 `json:"ConfidenceLevel,omitempty"`
 	// Rationale for why the conclusion was formed
 	AnalysisRationale string `json:"AnalysisRationale,omitempty"`
+	// URLs detected in the input text that were analyzed and found to be unsafe. Only populated when ProvideUrlAnalysis is true and URLs are detected.
+	UnsafeUrls []UnsafeUrlResult `json:"UnsafeUrls,omitempty"`
 }
